@@ -11,6 +11,8 @@ interface EnvVars {
   DB_LOGGING: string;
   DB_LOGGING_ENABLE: boolean;
   DB_NAME: string;
+  PRODUCT_MSV_HOST: string;
+  PRODUCT_MSV_PORT: number;
 }
 
 const envsSchema = joi
@@ -24,6 +26,8 @@ const envsSchema = joi
     DB_PASSWORD: joi.string().required(),
     DB_LOGGING: joi.string().required(),
     DB_LOGGING_ENABLED: joi.boolean().required(),
+    PRODUCT_MSV_HOST: joi.string().required(),
+    PRODUCT_MSV_PORT: joi.number().required(),
   })
   .unknown(true);
 
@@ -45,4 +49,6 @@ export const envs = {
   dbLogging: envVars.DB_LOGGING,
   dbLoggingEnable: envVars.DB_LOGGING_ENABLE,
   dbName: envVars.DB_NAME,
+  productMsvHost: envVars.PRODUCT_MSV_HOST,
+  productMsvPort: envVars.PRODUCT_MSV_PORT,
 };

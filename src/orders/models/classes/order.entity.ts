@@ -1,6 +1,7 @@
-import { Column, CreateDateColumn, Entity, PrimaryColumn, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, OneToMany, PrimaryColumn, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 import { ORDER_STATUS } from '../enum/order-status.enum';
 import { envs } from 'src/config';
+import { OrderItem } from './order-item.entity';
 
 @Entity('orders', { schema: envs.dbName })
 export class Order {
@@ -33,4 +34,7 @@ export class Order {
     nullable: true,
   })
   updatedAt: Date;
+
+  @OneToMany(() => OrderItem, (orderItem) => orderItem.order)
+  orderItems: OrderItem[];
 }

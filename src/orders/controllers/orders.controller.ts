@@ -1,5 +1,5 @@
-import { PaginationDTO } from './../../../../products-msv/src/common/pagination.dto';
-import { Controller, NotImplementedException } from '@nestjs/common';
+import { PaginationDTO } from './../../common/pagination.dto';
+import { Controller } from '@nestjs/common';
 import { MessagePattern, Payload, RpcException } from '@nestjs/microservices';
 import { OrdersService } from '../services/orders.service';
 import { CreateOrderDto } from '../models/dto/create-order.dto';
