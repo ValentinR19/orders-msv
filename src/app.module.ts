@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { envs } from './config';
 import { OrdersModule } from './orders/orders.module';
+import { NatsModule } from './nats/nats.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { OrdersModule } from './orders/orders.module';
       },
     }),
     OrdersModule,
+    NatsModule,
   ],
   controllers: [],
   providers: [],

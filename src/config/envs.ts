@@ -13,6 +13,7 @@ interface EnvVars {
   DB_NAME: string;
   PRODUCT_MSV_HOST: string;
   PRODUCT_MSV_PORT: number;
+  NATS_SERVERS: string;
 }
 
 const envsSchema = joi
@@ -28,10 +29,14 @@ const envsSchema = joi
     DB_LOGGING_ENABLED: joi.boolean().required(),
     PRODUCT_MSV_HOST: joi.string().required(),
     PRODUCT_MSV_PORT: joi.number().required(),
+    NATS_SERVERS: joi.array().items(joi.string().required()),
   })
   .unknown(true);
 
-const { error, value } = envsSchema.validate(process.env);
+const { error, value } = envsSchema.validate({
+  ...process.env,
+  NATS_SERVERS: process.env.NATS_SERVERS.split(','),
+});
 
 if (error) {
   throw new Error(`Config Validation Error: ${error}`);
@@ -51,4 +56,5 @@ export const envs = {
   dbName: envVars.DB_NAME,
   productMsvHost: envVars.PRODUCT_MSV_HOST,
   productMsvPort: envVars.PRODUCT_MSV_PORT,
+  natsServers: envVars.NATS_SERVERS,
 };

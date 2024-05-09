@@ -6,16 +6,16 @@ import { ClientProxy, RpcException } from '@nestjs/microservices';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PaginationDTO } from '../../common/pagination.dto';
 import { ChangeStatusDTO } from '../models/dto/change-status.dto';
-import { PRODUCT_SERVICE } from 'src/config';
 import { OrderItem } from '../models/classes/order-item.entity';
 import { firstValueFrom } from 'rxjs';
+import { NATS_SERVICE } from 'src/config';
 
 @Injectable()
 export class OrdersService {
   private logger = new Logger(OrdersService.name);
   constructor(
     @InjectRepository(Order) private readonly orderRepository: Repository<Order>,
-    @Inject(PRODUCT_SERVICE) private readonly productsClient: ClientProxy,
+    @Inject(NATS_SERVICE) private readonly productsClient: ClientProxy,
   ) {}
 
   async validateProducts(ids: number[]): Promise<any[]> {
@@ -39,7 +39,7 @@ export class OrdersService {
       return acc * item.quantity;
     }, 0);
     createOrderDto.orderItems = createOrderDto.orderItems.map((item: OrderItem) => {
-      item.price = products.find((product) => product.id === item.id).price;
+      item.price = products.find((product) => product.id === item.idProduct).price;
       return item;
     });
     return this.save({
