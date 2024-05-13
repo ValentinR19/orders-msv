@@ -4,6 +4,8 @@ import { envs } from './config';
 import { OrdersModule } from './orders/orders.module';
 import { NatsModule } from './nats/nats.module';
 
+import { SnakeNamingStrategy } from 'typeorm-naming-strategies/snake-naming.strategy';
+
 @Module({
   imports: [
     TypeOrmModule.forRoot({
@@ -16,10 +18,11 @@ import { NatsModule } from './nats/nats.module';
       schema: envs.dbName,
       logging: true,
       entities: ['dist/**/models/*/*{.entity.ts,.entity.js}'],
-      synchronize: true,
+      synchronize: false,
       extra: {
         timezone: 'local',
       },
+      namingStrategy: new SnakeNamingStrategy(),
     }),
     OrdersModule,
     NatsModule,
