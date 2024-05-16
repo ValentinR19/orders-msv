@@ -15,31 +15,33 @@ export class OrdersService {
   private logger = new Logger(OrdersService.name);
   constructor(
     @InjectRepository(Order) private readonly orderRepository: Repository<Order>,
-    @Inject(NATS_SERVICE) private readonly productsClient: ClientProxy,
+    @Inject(NATS_SERVICE) private readonly client: ClientProxy,
   ) {}
 
   async validateProducts(ids: number[]): Promise<any[]> {
     try {
-      const products = await firstValueFrom(this.productsClient.send({ cmd: 'validateProducts' }, { ids }));
+      const products = await firstValueFrom(this.client.send({ cmd: 'validateProducts' }, { ids }));
       return products;
     } catch (error) {
       throw new RpcException({ message: 'Los productos ingresados no son validos', status: HttpStatus.NOT_FOUND });
     }
   }
 
+  //DEVOLVER TAMBIEN EL NOMBRE DEL PRODUCTO
   async create(createOrderDto: CreateOrderDto) {
     const ids = createOrderDto.orderItems.map((item: OrderItem) => item.idProduct);
     const products = await this.validateProducts(ids);
     const totalAmount = createOrderDto.orderItems.reduce((acc, item: OrderItem) => {
       const price = products.find((producto) => producto.id === item.idProduct).price;
 
-      return price * item.quantity;
+      return acc + price * item.quantity;
     }, 0);
     const totalItems = createOrderDto.orderItems.reduce((acc, item: OrderItem) => {
-      return acc * item.quantity;
+      return acc + item.quantity;
     }, 0);
-    createOrderDto.orderItems = createOrderDto.orderItems.map((item: OrderItem) => {
+    createOrderDto.orderItems = createOrderDto.orderItems.map((item: any) => {
       item.price = products.find((product) => product.id === item.idProduct).price;
+      item.name = products.find((product) => product.id === item.idProduct).name;
       return item;
     });
     return this.save({
@@ -90,7 +92,7 @@ export class OrdersService {
     try {
       ids = Array.from(new Set(ids));
       this.logger.log(`Comienza la busqueda de los productos con id: ${ids}`);
-      const products = await firstValueFrom(this.productsClient.send({ cmd: 'findProductsByIds' }, { ids }));
+      const products = await firstValueFrom(this.client.send({ cmd: 'findProductsByIds' }, { ids }));
       this.logger.log(`Se completa la busqueda de los productos`);
       return products;
     } catch (error) {
@@ -105,5 +107,21 @@ export class OrdersService {
     }
 
     return this.orderRepository.update({ id: id }, { status: status });
+  }
+
+  async createSessionPayment(order: Order) {
+
+    const session = await firstValueFrom(
+      this.client.send('create.payment.session', {
+        idOrder: order.id,
+        currency: 'usd',
+        items: order.orderItems.map((item: any) => ({
+          price: item.price,
+          name: item.name,
+          quantity: item.quantity,
+        })),
+      }),
+    );
+    return session;
   }
 }

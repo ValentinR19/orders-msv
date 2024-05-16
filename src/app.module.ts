@@ -18,7 +18,7 @@ import { SnakeNamingStrategy } from 'typeorm-naming-strategies/snake-naming.stra
       schema: envs.dbName,
       logging: true,
       entities: ['dist/**/models/*/*{.entity.ts,.entity.js}'],
-      synchronize: false,
+      synchronize: true,
       extra: {
         timezone: 'local',
       },

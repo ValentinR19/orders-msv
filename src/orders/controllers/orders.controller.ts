@@ -1,6 +1,6 @@
 import { PaginationDTO } from './../../common/pagination.dto';
 import { Controller } from '@nestjs/common';
-import { MessagePattern, Payload, RpcException } from '@nestjs/microservices';
+import { EventPattern, MessagePattern, Payload, RpcException } from '@nestjs/microservices';
 import { OrdersService } from '../services/orders.service';
 import { CreateOrderDto } from '../models/dto/create-order.dto';
 import { ChangeStatusDTO } from '../models/dto/change-status.dto';
@@ -10,8 +10,10 @@ export class OrdersController {
   constructor(private readonly ordersService: OrdersService) {}
 
   @MessagePattern({ cmd: 'createOrder' })
-  create(@Payload() createOrderDto: CreateOrderDto) {
-    return this.ordersService.create(createOrderDto);
+  async create(@Payload() createOrderDto: CreateOrderDto) {
+    const order = await this.ordersService.create(createOrderDto);
+    const session = await this.ordersService.createSessionPayment(order);
+    return { order, session };
   }
 
   @MessagePattern({ cmd: 'findAllOrders' })
@@ -31,5 +33,10 @@ export class OrdersController {
     } catch (error) {
       throw new RpcException(error);
     }
+  }
+  @EventPattern('payment.succeded')
+  paidOrder(@Payload() paidOrderDto: any) {
+    console.log({ paidOrderDto });
+    return;
   }
 }

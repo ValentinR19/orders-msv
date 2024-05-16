@@ -18,7 +18,7 @@ export class OrderItem {
   @Column('decimal', { name: 'price' })
   price: number;
 
-  @ManyToOne(() => Order, (order) => order.orderItems)
+  @ManyToOne(() => Order, (order) => order.orderItems, { onUpdate: 'NO ACTION', onDelete: 'NO ACTION', orphanedRowAction: 'delete' })
   @JoinColumn({ name: 'id_order', referencedColumnName: 'id' })
   order: Order;
 }

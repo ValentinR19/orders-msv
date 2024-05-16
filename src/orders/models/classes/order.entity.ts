@@ -1,7 +1,8 @@
-import { Column, CreateDateColumn, Entity, OneToMany, PrimaryColumn, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, OneToMany, OneToOne, PrimaryColumn, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 import { ORDER_STATUS } from '../enum/order-status.enum';
 import { envs } from 'src/config';
 import { OrderItem } from './order-item.entity';
+import { OrderReceipt } from './order-receipt';
 
 @Entity('orders', { schema: envs.dbName })
 export class Order {
@@ -14,7 +15,7 @@ export class Order {
   @Column('int', { name: 'total_items' })
   totalItems: number;
 
-  @Column('enum', { name: 'status', enum: [ORDER_STATUS.PENDING, ORDER_STATUS.DELIVERED, ORDER_STATUS.CANCELLED], default: ORDER_STATUS.PENDING })
+  @Column('enum', { name: 'status', enum: [ORDER_STATUS.PENDING, ORDER_STATUS.DELIVERED, ORDER_STATUS.CANCELLED, ORDER_STATUS.PAID], default: ORDER_STATUS.PENDING })
   status: ORDER_STATUS;
 
   @Column('boolean', { name: 'paid', nullable: true })
@@ -22,6 +23,9 @@ export class Order {
 
   @Column('timestamp', { name: 'paid_at ', nullable: true })
   paidAt?: Date;
+
+  @Column('varchar', { name: 'stripe_charge_id', nullable: true })
+  stripeChargeId?: string;
 
   @CreateDateColumn({
     name: 'created_at',
@@ -35,6 +39,9 @@ export class Order {
   })
   updatedAt: Date;
 
-  @OneToMany(() => OrderItem, (orderItem) => orderItem.order)
+  @OneToMany(() => OrderItem, (orderItem) => orderItem.order, { cascade: true })
   orderItems: OrderItem[];
+
+  // @OneToOne(() => OrderReceipt, (orderReceipt) => orderReceipt.order)
+  // orderReceipt: OrderReceipt;
 }
