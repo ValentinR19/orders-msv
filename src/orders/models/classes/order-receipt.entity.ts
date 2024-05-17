@@ -10,8 +10,8 @@ export class OrderReceipt {
   @Column('int', { name: 'id_order' })
   idOrder: number;
 
-  @Column('varchar', { name: 'receip_url' })
-  receipUrl: string;
+  @Column('varchar', { name: 'receipt_url' })
+  receiptUrl: string;
 
   @CreateDateColumn({
     name: 'created_at',
@@ -25,7 +25,7 @@ export class OrderReceipt {
   })
   updatedAt: Date;
 
-  @OneToOne(() => Order)
+  @OneToOne(() => Order, (order) => order.orderReceipt, { onDelete: 'NO ACTION', onUpdate: 'NO ACTION', orphanedRowAction: 'delete' })
   @JoinColumn({ name: 'id_order', referencedColumnName: 'id' })
   order: Order;
 }

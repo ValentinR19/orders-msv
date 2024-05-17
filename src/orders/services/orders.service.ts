@@ -9,6 +9,9 @@ import { ChangeStatusDTO } from '../models/dto/change-status.dto';
 import { OrderItem } from '../models/classes/order-item.entity';
 import { firstValueFrom } from 'rxjs';
 import { NATS_SERVICE } from 'src/config';
+import { PaidOrderDto } from '../models/dto/pay-order.dto';
+import { ORDER_STATUS } from '../models/enum/order-status.enum';
+import { OrderReceipt } from '../models/classes/order-receipt.entity';
 
 @Injectable()
 export class OrdersService {
@@ -78,7 +81,7 @@ export class OrdersService {
     try {
       this.logger.log(`Comienza la busqueda de una orden con el siguiente id: ${id}`);
       const orden = await this.orderRepository.findOneOrFail({ where: { id } });
-      this.logger.log(`Comienza la busqueda de una orden con el siguiente id: ${id}`);
+      this.logger.log(`Se completa la busqueda de una orden con el siguiente id: ${id}`);
       const ids = orden.orderItems.map((item: OrderItem) => item.idProduct);
       const products = this.findProducts(ids);
 
@@ -110,7 +113,6 @@ export class OrdersService {
   }
 
   async createSessionPayment(order: Order) {
-
     const session = await firstValueFrom(
       this.client.send('create.payment.session', {
         idOrder: order.id,
@@ -123,5 +125,32 @@ export class OrdersService {
       }),
     );
     return session;
+  }
+
+  async paidOrder(paidOrderDTO: PaidOrderDto) {
+    this.logger.log(`Paid order ${JSON.stringify(paidOrderDTO)}`);
+    try {
+      this.logger.log(`Comienza la busqueda de una orden con el siguiente id: ${paidOrderDTO.idOrder}`);
+      const findOrder = await this.orderRepository.findOneOrFail({ where: { id: paidOrderDTO.idOrder } });
+      this.logger.log(`Se completa la busqueda de una orden con el siguiente id: ${paidOrderDTO.idOrder}`);
+    } catch (error) {
+      throw new RpcException({ message: 'La orden no se encuentra en la base de datos', status: HttpStatus.NOT_FOUND });
+    }
+    // const updatedOrder = await this.orderRepository.update(
+    //   { id: paidOrderDTO.idOrder },
+    //   { status: ORDER_STATUS.PAID, paid: true, paidAt: new Date(), stripeChargeId: paidOrderDTO.stripePaymentId, orderReceipt: { receiptUrl: paidOrderDTO.receiptUrl } },
+    // );
+
+    await this.orderRepository.save({
+      id: paidOrderDTO.idOrder,
+      paid: true,
+      status: ORDER_STATUS.PAID,
+      paidAt: new Date(),
+      stripeChargeId: paidOrderDTO.stripePaymentId,
+      orderReceipt: {
+        receiptUrl: paidOrderDTO.receiptUrl,
+      },
+    });
+    this.logger.log(`Se ha completado el pago de la order con exito!`);
   }
 }

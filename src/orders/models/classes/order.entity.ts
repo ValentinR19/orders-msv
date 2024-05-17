@@ -2,7 +2,7 @@ import { Column, CreateDateColumn, Entity, OneToMany, OneToOne, PrimaryColumn, P
 import { ORDER_STATUS } from '../enum/order-status.enum';
 import { envs } from 'src/config';
 import { OrderItem } from './order-item.entity';
-import { OrderReceipt } from './order-receipt';
+import { OrderReceipt } from './order-receipt.entity';
 
 @Entity('orders', { schema: envs.dbName })
 export class Order {
@@ -42,6 +42,6 @@ export class Order {
   @OneToMany(() => OrderItem, (orderItem) => orderItem.order, { cascade: true })
   orderItems: OrderItem[];
 
-  // @OneToOne(() => OrderReceipt, (orderReceipt) => orderReceipt.order)
-  // orderReceipt: OrderReceipt;
+  @OneToOne(() => OrderReceipt, (orderReceipt) => orderReceipt.order, { cascade: true })
+  orderReceipt: OrderReceipt;
 }

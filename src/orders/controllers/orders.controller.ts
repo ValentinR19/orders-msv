@@ -4,6 +4,8 @@ import { EventPattern, MessagePattern, Payload, RpcException } from '@nestjs/mic
 import { OrdersService } from '../services/orders.service';
 import { CreateOrderDto } from '../models/dto/create-order.dto';
 import { ChangeStatusDTO } from '../models/dto/change-status.dto';
+import { PaidOrderDto } from '../models/dto/pay-order.dto';
+import { log } from 'console';
 
 @Controller()
 export class OrdersController {
@@ -35,8 +37,7 @@ export class OrdersController {
     }
   }
   @EventPattern('payment.succeded')
-  paidOrder(@Payload() paidOrderDto: any) {
-    console.log({ paidOrderDto });
-    return;
+  async paidOrder(@Payload() paidOrderDto: PaidOrderDto) {
+    await this.ordersService.paidOrder(paidOrderDto);
   }
 }
