@@ -10,12 +10,12 @@ import { SnakeNamingStrategy } from 'typeorm-naming-strategies/snake-naming.stra
   imports: [
     TypeOrmModule.forRoot({
       type: 'postgres',
-      // url: envs.databaseUrl,
-      host: envs.dbHost,
-      port: 5432,
-      username: envs.dbUsername,
-      password: envs.dbPassword,
-      schema: envs.dbName,
+      url: envs.dbUrl,
+      // host: envs.dbHost,
+      // port: 5432,
+      // username: envs.dbUsername,
+      // password: envs.dbPassword,
+      // schema: envs.dbName,
       logging: true,
       entities: ['dist/**/models/*/*{.entity.ts,.entity.js}'],
       synchronize: true,

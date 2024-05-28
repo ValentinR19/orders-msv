@@ -2,7 +2,7 @@ import { Column, CreateDateColumn, Entity, JoinColumn, OneToOne, PrimaryGenerate
 import { Order } from './order.entity';
 import { envs } from 'src/config';
 
-@Entity('orders_receipt', { schema: envs.dbName })
+@Entity('orders_receipt')
 export class OrderReceipt {
   @PrimaryGeneratedColumn({ type: 'int', name: 'id' })
   id: number;

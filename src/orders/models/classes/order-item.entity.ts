@@ -1,5 +1,6 @@
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { Order } from './order.entity';
+import { envs } from 'src/config';
 
 @Entity('orders_items')
 export class OrderItem {

@@ -4,7 +4,7 @@ import { envs } from 'src/config';
 import { OrderItem } from './order-item.entity';
 import { OrderReceipt } from './order-receipt.entity';
 
-@Entity('orders', { schema: envs.dbName })
+@Entity('orders')
 export class Order {
   @PrimaryGeneratedColumn({ type: 'int', name: 'id' })
   id: number;
